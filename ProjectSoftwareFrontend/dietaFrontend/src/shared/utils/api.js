@@ -1,7 +1,9 @@
 import axios from 'axios';
 
-// const main_route = 'http://127.0.0.1:5000'
-const main_route = "http://flask_backend:5000";
+const main_route = 'http://127.0.0.1:5000'
+//const main_route = "http://flask_backend:5000";
+//const main_route = "http://localhost:5000";
+
 
 // Crear una instancia de Axios con la URL base de tu API backend
 const api = axios.create({
