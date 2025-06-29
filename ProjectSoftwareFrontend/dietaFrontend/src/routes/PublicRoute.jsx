@@ -4,7 +4,10 @@ import { Navigate } from "react-router-dom";
 
 const PublicRoute = ({ children }) => {
   const { currentUser } = useContext(AuthContext);
-  return currentUser ? <Navigate to="/dashboard" /> : children;
+  const localUser = JSON.parse(localStorage.getItem("currentUser"));
+  const effectiveUser = currentUser || localUser;
+
+  return effectiveUser ? <Navigate to="/dashboard" replace /> : children;
 };
 
 export default PublicRoute;

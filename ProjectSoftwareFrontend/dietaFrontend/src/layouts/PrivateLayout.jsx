@@ -12,7 +12,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
-import { BookOpen, CircleUserRound, LogOut, User } from "lucide-react";
+import { BookOpen, CircleUserRound, LogOut, Megaphone, User } from "lucide-react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { History, Home, Inbox, LibraryBig } from "lucide-react"
 import { useContext } from "react";
@@ -22,17 +22,17 @@ import { Button } from "@/components/ui/button";
 const itemsNavigations = [
   {
     title: "Home",
-    url: "#",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "Mi biblioteca",
-    url: "#",
+    url: "/dashboard/biblioteca",
     icon: LibraryBig,
   },
   {
     title: "Mi historial",
-    url: "#",
+    url: "/dashboard/historial",
     icon: History,
   }
 ]
@@ -40,13 +40,13 @@ const itemsNavigations = [
 const itemsFastActions = [
   {
     title: "Registrar un libro",
-    url: "#",
-    icon: Home,
+    url: "/dashboard/book",
+    icon: BookOpen,
   },
   {
     title: "Publicar Intercambio",
-    url: "#",
-    icon: LibraryBig,
+    url: "dashboard/intercambio",
+    icon: Megaphone,
   }
 ]
 

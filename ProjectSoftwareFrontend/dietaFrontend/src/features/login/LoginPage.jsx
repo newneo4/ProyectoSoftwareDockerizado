@@ -80,6 +80,8 @@ export default function LoginPage() {
 
       // Redireccionar al dashboard o a la página anterior
       setCurrentUser({email: email.trim(), password: password})
+      const user = { email: email.trim(), password: password };
+      localStorage.setItem("currentUser", JSON.stringify(user));
 
       const from = location.state?.from?.pathname || "/dashboard"
       navigate(from, { replace: true })

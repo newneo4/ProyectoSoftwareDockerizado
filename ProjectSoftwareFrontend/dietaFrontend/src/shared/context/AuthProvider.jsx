@@ -221,6 +221,7 @@ export function AuthProvider({ children }) {
     try {
       await signOut(auth)
       setCurrentUser(null)
+      localStorage.removeItem("currentUser");
       setUserProfile(null)
       return { success: true }
     } catch (error) {

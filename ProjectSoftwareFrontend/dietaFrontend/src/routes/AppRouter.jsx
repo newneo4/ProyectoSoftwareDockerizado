@@ -4,7 +4,10 @@ import PublicRoute from "./PublicRoute";
 import { UserRoutes } from "./UserRoutes";
 import PrivateLayout from "@/layouts/PrivateLayout";
 import DashboardPage from "@/features/dashboard/DashboardPage"; 
-// import { BookPage } from "@/features/book/BookPage";
+import BookPage from "@/features/book/BookPage";
+import BibliotecaPage from "@/features/biblioteca/BibliotecaPage";
+import HistorialPage from "@/features/historial/HistorialPage";
+import IntercambioPage from "@/features/intercambio/IntercambioPage";
 
 const AppRouter = () => {
   return (
@@ -21,7 +24,10 @@ const AppRouter = () => {
         </PrivateRoute>
       }>
         <Route index element={<DashboardPage />} />
-        {/* <Route path="book" element={<BookPage/>} /> */}
+        <Route path="book" element={<BookPage/>} />
+        <Route path="biblioteca" element={<BibliotecaPage/>} />
+        <Route path="historial" element={<HistorialPage/>} />
+        <Route path="intercambio" element={<IntercambioPage/>} />
       </Route>
     </Routes>
   );
