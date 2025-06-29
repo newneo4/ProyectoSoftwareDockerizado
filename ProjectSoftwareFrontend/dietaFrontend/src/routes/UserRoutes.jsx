@@ -1,6 +1,4 @@
 import { Route, Routes } from "react-router-dom";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
 import LoginPage from "@/features/login/LoginPage";
 import RegisterPage from "@/features/register/RegisterPage";
 import Home from "@/features/landing/LandingPage";
