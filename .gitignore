@@ -1,0 +1,42 @@
+# ─── Flask Backend ───────────────────────────────
+ProjectSoftwareBackend/__pycache__/
+ProjectSoftwareBackend/**/*.py[cod]
+ProjectSoftwareBackend/*.pyc
+ProjectSoftwareBackend/.env
+ProjectSoftwareBackend/venv/
+ProjectSoftwareBackend/env/
+ProjectSoftwareBackend/instance/
+ProjectSoftwareBackend/*.db
+ProjectSoftwareBackend/*.sqlite3
+ProjectSoftwareBackend/.mypy_cache/
+ProjectSoftwareBackend/.pytest_cache/
+ProjectSoftwareBackend/.coverage
+ProjectSoftwareBackend/htmlcov/
+ProjectSoftwareBackend/*.log
+ProjectSoftwareBackend/backup/
+ProjectSoftwareBackend/*.py~
+
+# ─── React Frontend con Vite ─────────────────────
+ProjectSoftwareFrontend/dietaFrontend/node_modules/
+ProjectSoftwareFrontend/dietaFrontend/dist/
+ProjectSoftwareFrontend/dietaFrontend/.env
+ProjectSoftwareFrontend/dietaFrontend/npm-debug.log*
+ProjectSoftwareFrontend/dietaFrontend/yarn-debug.log*
+ProjectSoftwareFrontend/dietaFrontend/yarn-error.log*
+ProjectSoftwareFrontend/dietaFrontend/package-lock.json
+ProjectSoftwareFrontend/dietaFrontend/.vite/
+
+# ─── Docker ──────────────────────────────────────
+*.pid
+*.container
+*.tar
+
+# ─── IDEs y temporales ───────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ─── Sistema ─────────────────────────────────────
+.DS_Store
+Thumbs.db
