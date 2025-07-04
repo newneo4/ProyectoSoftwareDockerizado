@@ -15,9 +15,10 @@ import {
 import { BookOpen, CircleUserRound, LogOut, Megaphone, User } from "lucide-react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { History, Home, Inbox, LibraryBig } from "lucide-react"
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "@/shared/context/AuthContext";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 const itemsNavigations = [
   {
@@ -52,7 +53,25 @@ const itemsFastActions = [
 
 export default function PrivateLayout() {
   const { logout } = useContext(AuthContext);
+  const [user, setUser] = useState({
+    username: '',
+    email: ''
+  })
   const navigate = useNavigate()
+
+   useEffect(() => {
+    const storedUser = localStorage.getItem("currentUser");
+
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        console.log(parsedUser);
+      } catch (error) {
+        console.error("Error parsing currentUser from localStorage:", error);
+      }
+    }
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -122,8 +141,8 @@ export default function PrivateLayout() {
                 <SidebarMenuButton>
                 <CircleUserRound />
                 <div className="flex gap-0 flex-col">
-                  <span>Andres</span>
-                  <small>email@gmail.com</small>
+                  <span>BIENVENIDO</span>
+                  <small>{user.email}</small>
                 </div>
                 </SidebarMenuButton>
               </SidebarMenuItem>

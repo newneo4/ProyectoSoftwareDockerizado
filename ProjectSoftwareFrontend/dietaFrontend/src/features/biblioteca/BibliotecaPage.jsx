@@ -52,117 +52,32 @@ const BibliotecaPage = () => {
   const locationSuccessMessage = location.state?.message
   const newBook = location.state?.newBook
 
-  // Datos de ejemplo de libros registrados
-  const initialBooks = [
-    {
-      id: 1,
-      titulo: "Cien años de soledad",
-      autor: "Gabriel García Márquez",
-      año: 1967,
-      editorial: "Sudamericana",
-      genero: "Realismo mágico",
-      isbn: "978-84-376-0494-7",
-      imagen: "https://bookscompany.pe/wp-content/uploads/2025/02/9788466379717.jpg",
-      publicado: false,
-      fechaRegistro: "2024-01-15",
-      descripcion: "Una obra maestra del realismo mágico que narra la historia de la familia Buendía.",
-    },
-    {
-      id: 2,
-      titulo: "1984",
-      autor: "George Orwell",
-      año: 1949,
-      editorial: "Secker & Warburg",
-      genero: "Distopía",
-      isbn: "978-0-452-28423-4",
-      imagen: "https://m.media-amazon.com/images/I/61kjuGfZyML.jpg",
-      publicado: true,
-      fechaRegistro: "2024-01-10",
-      descripcion: "Una novela distópica que explora temas de totalitarismo y vigilancia.",
-    },
-    {
-      id: 3,
-      titulo: "El Principito",
-      autor: "Antoine de Saint-Exupéry",
-      año: 1943,
-      editorial: "Reynal & Hitchcock",
-      genero: "Infantil",
-      isbn: "978-2-07-040847-4",
-      imagen: "https://www.elvirrey.com/imagenes/9786124/978612470538.GIF",
-      publicado: false,
-      fechaRegistro: "2024-01-12",
-      descripcion: "Una hermosa fábula sobre la amistad, el amor y la pérdida de la inocencia.",
-    },
-    {
-      id: 4,
-      titulo: "Don Quijote de la Mancha",
-      autor: "Miguel de Cervantes",
-      año: 1605,
-      editorial: "Francisco de Robles",
-      genero: "Clásico",
-      isbn: "978-84-376-0675-0",
-      imagen: "https://images.cdn2.buscalibre.com/fit-in/360x360/73/b6/73b6fd96c31d26e2b6a3531808c1188c.jpg",
-      publicado: false,
-      fechaRegistro: "2024-01-08",
-      descripcion: "La obra cumbre de la literatura española y una de las novelas más influyentes.",
-    },
-    {
-      id: 5,
-      titulo: "Rayuela",
-      autor: "Julio Cortázar",
-      año: 1963,
-      editorial: "Sudamericana",
-      genero: "Novela experimental",
-      isbn: "978-84-376-0234-9",
-      imagen: "https://www.elvirrey.com/imagenes/9786124/978612434649.GIF",
-      publicado: true,
-      fechaRegistro: "2024-01-05",
-      descripcion: "Una novela experimental que desafía las convenciones narrativas tradicionales.",
-    },
-    {
-      id: 6,
-      titulo: "La Casa de los Espíritus",
-      autor: "Isabel Allende",
-      año: 1982,
-      editorial: "Sudamericana",
-      genero: "Realismo mágico",
-      isbn: "978-84-376-0123-6",
-      imagen: "https://images.cdn2.buscalibre.com/fit-in/360x360/f4/36/f436345c6e5e5c4403f5a40ffd373aac.jpg",
-      publicado: false,
-      fechaRegistro: "2024-01-03",
-      descripcion: "Una saga familiar que combina realismo mágico con crítica social.",
-    },
-  ]
+  // useEffect(() => {
+  //   let booksToSet = [...initialBooks]
 
-  const ciudades = [
-    "Buenos Aires",
-    "Córdoba",
-    "Rosario",
-    "Mendoza",
-    "La Plata",
-    "Mar del Plata",
-    "Salta",
-    "Santa Fe",
-    "San Juan",
-    "Resistencia",
-  ]
+  //   if (newBook) {
+  //     booksToSet = [newBook, ...booksToSet]
+  //   }
+
+  //   setBooks(booksToSet)
+
+  //   if (locationSuccessMessage) {
+  //     setSuccessMessage(locationSuccessMessage)
+  //     setTimeout(() => setSuccessMessage(""), 5000)
+  //   }
+  // }, [newBook, locationSuccessMessage])
 
   useEffect(() => {
-    let booksToSet = [...initialBooks]
+    const storedBooks = localStorage.getItem("libros");
 
-    // Si hay un nuevo libro del registro, agregarlo
-    if (newBook) {
-      booksToSet = [newBook, ...booksToSet]
+    if (storedBooks) {
+      try {
+        setBooks(JSON.parse(storedBooks));
+      } catch (error) {
+        console.error("Error al parsear libros:", error);
+      }
     }
-
-    setBooks(booksToSet)
-
-    // Mostrar mensaje de éxito si existe
-    if (locationSuccessMessage) {
-      setSuccessMessage(locationSuccessMessage)
-      setTimeout(() => setSuccessMessage(""), 5000)
-    }
-  }, [newBook, locationSuccessMessage])
+  }, []);
 
   // Filtrar libros según búsqueda y género
   const filteredBooks = books.filter((book) => {
@@ -216,7 +131,7 @@ const BibliotecaPage = () => {
   }
 
   const handleAddBook = () => {
-    navigate("/book-page")
+    navigate("/dashboard/book")
   }
 
   const handleBackToBiblioteca = () => {
@@ -350,7 +265,7 @@ const BibliotecaPage = () => {
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="flex gap-6">
+                {/* <div className="flex gap-6">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-blue-600">{stats.total}</div>
                     <div className="text-sm text-gray-600">Total</div>
@@ -363,7 +278,7 @@ const BibliotecaPage = () => {
                     <div className="text-2xl font-bold text-orange-600">{stats.pendientes}</div>
                     <div className="text-sm text-gray-600">Pendientes</div>
                   </div>
-                </div>
+                </div> */}
                 <Button onClick={handleAddBook} className="bg-blue-600 hover:bg-blue-700">
                   <Plus className="mr-2 h-4 w-4" />
                   Agregar Libro
@@ -397,7 +312,7 @@ const BibliotecaPage = () => {
               <Input
                 type="search"
                 placeholder="Buscar por título o autor..."
-                className="pl-10"
+                className="pl-10 bg-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -405,7 +320,7 @@ const BibliotecaPage = () => {
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-gray-500" />
               <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-                <SelectTrigger className="w-48">
+                <SelectTrigger className="w-48 bg-white">
                   <SelectValue placeholder="Todos los géneros" />
                 </SelectTrigger>
                 <SelectContent>
@@ -477,37 +392,18 @@ const BibliotecaPage = () => {
                     </p>
 
                     <div className="space-y-1 text-sm text-gray-600">
-                      {book.año && (
-                        <div className="flex justify-between">
-                          <span className="flex items-center">
-                            <Calendar className="mr-1 h-3 w-3" />
-                            Año:
-                          </span>
-                          <span className="font-medium">{book.año}</span>
-                        </div>
-                      )}
-                      {book.editorial && (
-                        <div className="flex justify-between">
-                          <span className="flex items-center">
-                            <Building className="mr-1 h-3 w-3" />
-                            Editorial:
-                          </span>
-                          <span className="font-medium text-right text-xs">{book.editorial}</span>
-                        </div>
-                      )}
                       <div className="flex justify-between">
                         <span>Género:</span>
                         <Badge variant="outline" className="text-xs">
                           {book.genero}
                         </Badge>
                       </div>
-                      {book.isbn && (
-                        <div className="flex justify-between">
+                      {book.descripcion && (
+                        <div className="flex justify-between flex-col gap-2">
                           <span className="flex items-center">
-                            <Hash className="mr-1 h-3 w-3" />
-                            ISBN:
+                            Descripcion:
                           </span>
-                          <span className="font-mono text-xs">{book.isbn}</span>
+                          <span className="font-mono text-xs">{book.descripcion}</span>
                         </div>
                       )}
                     </div>

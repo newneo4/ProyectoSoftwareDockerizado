@@ -157,7 +157,18 @@ const BookPage = () => {
       console.log("Datos del libro:", formData)
       console.log("Imagen:", selectedImage)
 
-      // Navigate to biblioteca page after successful registration
+      const newBook = {
+        ...formData,
+        id: Date.now(),
+        imagen: imagePreview,
+      };
+
+      const storedBooks = JSON.parse(localStorage.getItem("libros")) || [];
+
+      const updatedBooks = [...storedBooks, newBook];
+
+      localStorage.setItem("libros", JSON.stringify(updatedBooks));
+
       navigate("/biblioteca", {
         state: {
           message: "¡Libro registrado exitosamente! Ahora puedes publicarlo.",
@@ -167,6 +178,7 @@ const BookPage = () => {
             imagen: imagePreview,
           },
         },
+
       })
     } catch (error) {
       console.error("Error al registrar libro:", error)
@@ -350,7 +362,6 @@ const BookPage = () => {
             </CardContent>
           </Card>
 
-          {/* Botón de envío */}
           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg" disabled={loading}>
             {loading ? (
               <div className="flex items-center">
