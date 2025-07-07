@@ -5,8 +5,7 @@ libro_bp = Blueprint('libro_bp', __name__, url_prefix='/libros')
 
 @libro_bp.route('/', methods=['POST'])
 def crear_libro():
-    from flask import request
-    return publicar_libro(request.json)
+    return publicar_libro()  # 🔥 Ya NO usar `request.json`
 
 @libro_bp.route('/', methods=['GET'])
 def obtener_libros():

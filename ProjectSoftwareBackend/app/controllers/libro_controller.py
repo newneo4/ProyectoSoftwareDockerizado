@@ -1,27 +1,47 @@
-from flask import jsonify
+from flask import request, jsonify
 from app import db
 from app.models.libro import Libro
-from app.models.usuario import Usuario
-from app.models.genero import Genero  # ✅ nuevo import
+import os
+from werkzeug.utils import secure_filename
 
-def publicar_libro(data):
-    usuario = Usuario.query.get(data['usuario_id'])
-    if not usuario:
-        return jsonify({"error": "Usuario no encontrado"}), 404
+UPLOAD_FOLDER = "app/static/uploads"
 
+def publicar_libro():
+    data = request.form
+    imagen_file = request.files.get("imagen")
+
+    # Validar campos obligatorios
+    campos = ['titulo', 'autor', 'estado', 'tipo', 'usuario_id', 'genero_id']
+    for campo in campos:
+        if campo not in data or not data[campo]:
+            return jsonify({"error": f"Falta el campo '{campo}'"}), 400
+
+    # Guardar la imagen si viene
+    imagen_nombre = None
+    if imagen_file:
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+        imagen_nombre = secure_filename(imagen_file.filename)
+        imagen_path = os.path.join(UPLOAD_FOLDER, imagen_nombre)
+        imagen_file.save(imagen_path)
+
+    # Crear libro
     libro = Libro(
         titulo=data['titulo'],
         autor=data['autor'],
         descripcion=data.get('descripcion'),
         estado=data['estado'],
         tipo=data['tipo'],
-        usuario_id=usuario.id,
-        genero_id=data['genero_id']
+        usuario_id=int(data['usuario_id']),
+        genero_id=int(data['genero_id']),
+        imagen=imagen_nombre
     )
+
     db.session.add(libro)
     db.session.commit()
 
     return jsonify({"mensaje": "Libro publicado", "id_libro": libro.id}), 201
+
 
 def buscar_libros(titulo=None, autor=None):
     query = Libro.query
@@ -29,17 +49,24 @@ def buscar_libros(titulo=None, autor=None):
         query = query.filter(Libro.titulo.ilike(f"%{titulo}%"))
     if autor:
         query = query.filter(Libro.autor.ilike(f"%{autor}%"))
-    
+
     libros = query.all()
-    resultado = [{
-        "id": libro.id,
-        "titulo": libro.titulo,
-        "autor": libro.autor,
-        "descripcion": libro.descripcion,    # ✅ nuevo campo
-        "estado": libro.estado,
-        "tipo": libro.tipo,
-        "usuario_id": libro.usuario_id,
-        "genero_id": libro.genero_id
-    } for libro in libros]
+    resultado = []
+    for libro in libros:
+        imagen_url = None
+        if libro.imagen:
+            imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+
+        resultado.append({
+            "id": libro.id,
+            "titulo": libro.titulo,
+            "autor": libro.autor,
+            "descripcion": libro.descripcion,
+            "estado": libro.estado,
+            "tipo": libro.tipo,
+            "usuario_id": libro.usuario_id,
+            "genero_id": libro.genero_id,
+            "imagen_url": imagen_url
+        })
 
     return jsonify(resultado)
