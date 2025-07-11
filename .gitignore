@@ -7,7 +7,6 @@ ProjectSoftwareBackend/venv/
 ProjectSoftwareBackend/env/
 ProjectSoftwareBackend/instance/
 ProjectSoftwareBackend/*.db
-ProjectSoftwareBackend/*.sqlite3
 ProjectSoftwareBackend/.mypy_cache/
 ProjectSoftwareBackend/.pytest_cache/
 ProjectSoftwareBackend/.coverage
