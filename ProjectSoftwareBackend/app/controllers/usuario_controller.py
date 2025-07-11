@@ -41,5 +41,5 @@ def registrar_usuario(data):
 def login_usuario(data):
     usuario = Usuario.query.filter_by(email=data['email']).first()
     if usuario and usuario.check_password(data['password']):
-        return jsonify({"message": "Login exitoso", "usuario": usuario.nombre})
+        return jsonify({"message": "Login exitoso", "usuario": usuario.nombre, "id": usuario.id, "email": usuario.email})
     return jsonify({"error": "Credenciales inválidas"}), 401

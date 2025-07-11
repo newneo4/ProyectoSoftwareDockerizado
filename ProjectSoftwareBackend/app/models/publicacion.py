@@ -9,6 +9,8 @@ class TipoPublicacionEnum(Enum):
 class EstadoLibroEnum(Enum):
     NUEVO = 'nuevo'
     USADO = 'usado'
+    BUEN_ESTADO= 'buen-estado'
+    COMO_NUEVO = 'como-nuevo'
 
 class Publicacion(db.Model):
     __tablename__ = 'publicaciones'

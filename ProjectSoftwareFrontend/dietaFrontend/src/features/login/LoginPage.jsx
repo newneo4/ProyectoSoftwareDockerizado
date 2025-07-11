@@ -72,15 +72,15 @@ export default function LoginPage() {
         return
       }
 
-      await ObtenerUsuario({email: email.trim(), password: password})
+      const response = await ObtenerUsuario({email: email.trim(), password: password})
 
       console.log("🔄 Iniciando sesión con email...")
       //await signInWithEmailAndPassword(auth, email.trim(), password)
-      console.log("✅ Login exitoso")
+      console.log("✅ Login exitoso", response)
 
       // Redireccionar al dashboard o a la página anterior
-      setCurrentUser({email: email.trim(), password: password})
-      const user = { email: email.trim(), password: password };
+      setCurrentUser({email: response.email, password: password, id: response.id, nombre: response.usuario})
+      const user = { email: response.email, id: response.id, nombre: response.usuario };
       localStorage.setItem("currentUser", JSON.stringify(user));
 
       const from = location.state?.from?.pathname || "/dashboard"

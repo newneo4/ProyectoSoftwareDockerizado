@@ -20,7 +20,7 @@ def crear_publicacion(data):
         return jsonify({'error': str(e)}), 400
 
 def obtener_publicaciones():
-    publicaciones = Publicacion.query.all()
+    publicaciones = Publicacion.query.filter_by(is_active=True).all()
     resultado = [
         {
             'id': p.id,
@@ -33,7 +33,20 @@ def obtener_publicaciones():
             'imagen_url': p.imagen_url,
             'is_active': p.is_active,
             'created_at': p.created_at.isoformat(),
-            'updated_at': p.updated_at.isoformat()
+            'updated_at': p.updated_at.isoformat(),
+            'libro': {
+                'titulo': p.libro.titulo,
+                'autor': p.libro.autor,
+                'descripcion': p.libro.descripcion,
+                'estado': p.libro.estado,
+                'tipo': p.libro.tipo,
+                'imagen_url': f"http://localhost:5000/static/uploads/{p.libro.imagen}" if p.libro.imagen else None,
+                'genero_id': p.libro.genero_id,
+            },
+            'usuario': {
+                'nombre': p.usuario.nombre, 
+                'email': p.usuario.email,
+            }
         } for p in publicaciones
     ]
     return jsonify(resultado), 200
@@ -78,3 +91,37 @@ def eliminar_publicacion(pub_id):
     db.session.delete(pub)
     db.session.commit()
     return jsonify({'mensaje': 'Publicación eliminada'}), 200
+
+def obtener_publicaciones_por_usuario(usuario_id):
+    publicaciones = Publicacion.query.filter_by(usuario_id=usuario_id).all()
+
+    resultado = [
+        {
+            'id': p.id,
+            'libro_id': p.libro_id,
+            'usuario_id': p.usuario_id,
+            'tipo': p.tipo.value,
+            'estado_libro': p.estado_libro.value,
+            'ubicacion': p.ubicacion,
+            'comentarios_adicionales': p.comentarios_adicionales,
+            'imagen_url': p.imagen_url,
+            'is_active': p.is_active,
+            'created_at': p.created_at.isoformat(),
+            'updated_at': p.updated_at.isoformat(),
+            'libro': {
+                'titulo': p.libro.titulo,
+                'autor': p.libro.autor,
+                'descripcion': p.libro.descripcion,
+                'estado': p.libro.estado,
+                'tipo': p.libro.tipo,
+                'imagen_url': f"http://localhost:5000/static/uploads/{p.libro.imagen}" if p.libro.imagen else None,
+                'genero_id': p.libro.genero_id,
+                'genero': p.libro.genero.nombre if p.libro.genero else None,
+            },
+            'usuario': {
+                'nombre': p.usuario.nombre, 
+                'email': p.usuario.email,
+            }
+        } for p in publicaciones
+    ]
+    return jsonify(resultado), 200

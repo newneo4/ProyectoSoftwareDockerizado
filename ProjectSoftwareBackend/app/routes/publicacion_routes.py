@@ -4,17 +4,18 @@ from app.controllers.publicacion_controller import (
     obtener_publicaciones,
     obtener_publicacion,
     actualizar_publicacion,
-    eliminar_publicacion
+    eliminar_publicacion,
+    obtener_publicaciones_por_usuario
 )
 
 publicacion_bp = Blueprint('publicacion_bp', __name__, url_prefix='/publicaciones')
 
-@publicacion_bp.route('/', methods=['POST'])  # ← corregido aquí
+@publicacion_bp.route('/', methods=['POST'])  
 def crear():
     data = request.json
     return crear_publicacion(data)
 
-@publicacion_bp.route('/', methods=['GET'])  # ← corregido aquí
+@publicacion_bp.route('/', methods=['GET'])  
 def listar():
     return obtener_publicaciones()
 
@@ -31,5 +32,8 @@ def actualizar(pub_id):
 def eliminar(pub_id):
     return eliminar_publicacion(pub_id)
 
+@publicacion_bp.route('/usuario/<int:usuario_id>', methods=['GET'])
+def publicaciones_por_usuario(usuario_id):
+    return obtener_publicaciones_por_usuario(usuario_id)
 
 print("✅ publicacion_routes.py CARGADO")

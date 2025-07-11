@@ -1,5 +1,5 @@
 from flask import Blueprint
-from app.controllers.libro_controller import publicar_libro, buscar_libros
+from app.controllers.libro_controller import publicar_libro, buscar_libros, obtener_libros_por_usuario
 
 libro_bp = Blueprint('libro_bp', __name__, url_prefix='/libros')
 
@@ -13,3 +13,8 @@ def obtener_libros():
     titulo = request.args.get('titulo')
     autor = request.args.get('autor')
     return buscar_libros(titulo, autor)
+
+
+@libro_bp.route('/usuario/<int:usuario_id>', methods=['GET'])
+def libros_por_usuario(usuario_id):
+    return obtener_libros_por_usuario(usuario_id)

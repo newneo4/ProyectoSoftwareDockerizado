@@ -15,5 +15,6 @@ class Libro(db.Model):
     usuario_id = db.Column(db.Integer, db.ForeignKey('usuario.id'), nullable=False)
     genero_id = db.Column(db.Integer, db.ForeignKey('genero.id'), nullable=False)
 
-    solicitudes = db.relationship('Solicitud', backref='libro', lazy=True)
+    # solicitudes = db.relationship('Solicitud', backref='libro', lazy=True)
+    solicitudes = db.relationship('Solicitud', back_populates='libro')
     genero = db.relationship('Genero', backref='libros')

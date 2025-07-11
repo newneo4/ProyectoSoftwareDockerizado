@@ -15,6 +15,9 @@ ProjectSoftwareBackend/htmlcov/
 ProjectSoftwareBackend/*.log
 ProjectSoftwareBackend/backup/
 ProjectSoftwareBackend/*.py~
+__pycache__/
+*.py[cod]
+
 
 # ─── React Frontend con Vite ─────────────────────
 ProjectSoftwareFrontend/dietaFrontend/node_modules/

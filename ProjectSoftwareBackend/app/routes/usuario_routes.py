@@ -26,8 +26,8 @@ def login():
 
 @usuario_bp.route('/libros', methods=['POST'])
 def publicar():
-    data = request.json
-    return publicar_libro(data)
+    # data = request.json
+    return publicar_libro()
 
 @usuario_bp.route('/libros', methods=['GET'])
 def buscar():

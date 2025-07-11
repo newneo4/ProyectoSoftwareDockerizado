@@ -8,6 +8,8 @@ import BookPage from "@/features/book/BookPage";
 import BibliotecaPage from "@/features/biblioteca/BibliotecaPage";
 import HistorialPage from "@/features/historial/HistorialPage";
 import IntercambioPage from "@/features/intercambio/IntercambioPage";
+import DonacionesPage from "@/features/donaciones/Donaciones";
+import CambiosPage from "@/features/cambios/CambiosPage";
 
 const AppRouter = () => {
   return (
@@ -28,6 +30,8 @@ const AppRouter = () => {
         <Route path="biblioteca" element={<BibliotecaPage/>} />
         <Route path="historial" element={<HistorialPage/>} />
         <Route path="intercambio" element={<IntercambioPage/>} />
+        <Route path="donacion" element={<DonacionesPage/>} />
+        <Route path="cambios" element={<CambiosPage/>} />
       </Route>
     </Routes>
   );

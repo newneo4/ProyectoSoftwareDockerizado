@@ -3,6 +3,7 @@ from app import db
 from app.models.libro import Libro
 import os
 from werkzeug.utils import secure_filename
+from app.models.publicacion import Publicacion  
 
 UPLOAD_FOLDER = "app/static/uploads"
 
@@ -67,6 +68,35 @@ def buscar_libros(titulo=None, autor=None):
             "usuario_id": libro.usuario_id,
             "genero_id": libro.genero_id,
             "imagen_url": imagen_url
+        })
+
+    return jsonify(resultado)
+
+
+
+def obtener_libros_por_usuario(usuario_id):
+    libros = Libro.query.filter_by(usuario_id=usuario_id).all()
+    resultado = []
+
+    for libro in libros:
+        imagen_url = None
+        if libro.imagen:
+            imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+
+        publicacion_activa = Publicacion.query.filter_by(libro_id=libro.id).first()
+
+        resultado.append({
+            "id": libro.id,
+            "titulo": libro.titulo,
+            "autor": libro.autor,
+            "descripcion": libro.descripcion,
+            "estado": libro.estado,
+            "tipo": libro.tipo,
+            "usuario_id": libro.usuario_id,
+            "genero_id": libro.genero_id,
+            "genero": libro.genero.nombre if libro.genero else None,
+            "imagen_url": imagen_url,
+            "esta_publicado": publicacion_activa is not None  
         })
 
     return jsonify(resultado)

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { use, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -7,6 +7,7 @@ import { Label } from "../../components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { BookOpen, Upload, X } from "lucide-react"
+import { crearLibro } from "./bookService"
 
 const BookPage = () => {
   const navigate = useNavigate()
@@ -22,27 +23,28 @@ const BookPage = () => {
   const [errors, setErrors] = useState({})
 
   const generos = [
-    "Ficción",
-    "Romance",
-    "Misterio",
-    "Ciencia Ficción",
-    "Fantasía",
-    "Biografía",
-    "Historia",
-    "Autoayuda",
-    "Negocios",
-    "Salud",
-    "Cocina",
-    "Arte",
-    "Religión",
-    "Filosofía",
-    "Poesía",
-    "Drama",
-    "Infantil",
-    "Juvenil",
-    "Educativo",
-    "Técnico",
-  ]
+    { id: 1, nombre: "Ficción" },
+    { id: 2, nombre: "Romance" },
+    { id: 3, nombre: "Misterio" },
+    { id: 4, nombre: "Ciencia Ficción" },
+    { id: 5, nombre: "Fantasía" },
+    { id: 6, nombre: "Biografía" },
+    { id: 7, nombre: "Historia" },
+    { id: 8, nombre: "Autoayuda" },
+    { id: 9, nombre: "Negocios" },
+    { id: 10, nombre: "Salud" },
+    { id: 11, nombre: "Cocina" },
+    { id: 12, nombre: "Arte" },
+    { id: 13, nombre: "Religión" },
+    { id: 14, nombre: "Filosofía" },
+    { id: 15, nombre: "Poesía" },
+    { id: 16, nombre: "Drama" },
+    { id: 17, nombre: "Infantil" },
+    { id: 18, nombre: "Juvenil" },
+    { id: 19, nombre: "Educativo" },
+    { id: 20, nombre: "Técnico" },
+  ];
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target
@@ -152,16 +154,45 @@ const BookPage = () => {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
+      
       console.log("Datos del libro:", formData)
       console.log("Imagen:", selectedImage)
+
+      const user = JSON.parse(localStorage.getItem("currentUser"))
+
+      const generoSeleccionado = generos.find(g => g.nombre === formData.genero);
+
+      if (!generoSeleccionado) {
+        setErrors({ genero: "Género no válido" });
+        setLoading(false);
+        return;
+      }
 
       const newBook = {
         ...formData,
         id: Date.now(),
+        usuario_id: user.id,
+        tipo: "fisico",
+        estado: "nuevo",
+        genero_id: generoSeleccionado.id,
         imagen: imagePreview,
       };
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("titulo", newBook.titulo);
+      formDataToSend.append("autor", newBook.autor);
+      formDataToSend.append("descripcion", newBook.descripcion);
+      formDataToSend.append("estado", "nuevo");
+      formDataToSend.append("tipo", "fisico");
+      formDataToSend.append("usuario_id", user.id);         // número o string
+      formDataToSend.append("genero_id", generoSeleccionado.id);          // número o string
+      formDataToSend.append("imagen", selectedImage); // archivo File
+
+
+      const response = await crearLibro(formDataToSend);
+      
+      console.log(formDataToSend, response)
+      console.log([...formDataToSend.entries()]);
 
       const storedBooks = JSON.parse(localStorage.getItem("libros")) || [];
 
@@ -169,7 +200,7 @@ const BookPage = () => {
 
       localStorage.setItem("libros", JSON.stringify(updatedBooks));
 
-      navigate("/biblioteca", {
+      navigate("/dashboard/biblioteca", {
         state: {
           message: "¡Libro registrado exitosamente! Ahora puedes publicarlo.",
           newBook: {
@@ -252,29 +283,29 @@ const BookPage = () => {
                 {errors.autor && <p className="text-sm text-red-600">{errors.autor}</p>}
               </div>
 
-              {/* Género */}
-              <div className="space-y-2">
-                <Label htmlFor="genero">
-                  Género <span className="text-red-500">*</span>
-                </Label>
-                <Select
-                  value={formData.genero}
-                  onValueChange={(value) => handleSelectChange("genero", value)}
-                  disabled={loading}
-                >
-                  <SelectTrigger className={errors.genero ? "border-red-500" : ""}>
-                    <SelectValue placeholder="Selecciona un género" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {generos.map((genero) => (
-                      <SelectItem key={genero} value={genero}>
-                        {genero}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.genero && <p className="text-sm text-red-600">{errors.genero}</p>}
-              </div>
+                {/* Género */}
+                <div className="space-y-2">
+                  <Label htmlFor="genero">
+                    Género <span className="text-red-500">*</span>
+                  </Label>
+                  <Select
+                    value={formData.genero}
+                    onValueChange={(value) => handleSelectChange("genero", value)} // guardamos solo el nombre
+                    disabled={loading}
+                  >
+                    <SelectTrigger className={errors.genero ? "border-red-500" : ""}>
+                      <SelectValue placeholder="Selecciona un género" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {generos.map((genero) => (
+                        <SelectItem key={genero.id} value={genero.nombre}>
+                          {genero.nombre}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {errors.genero && <p className="text-sm text-red-600">{errors.genero}</p>}
+                </div>
 
               {/* Descripción */}
               <div className="space-y-2">

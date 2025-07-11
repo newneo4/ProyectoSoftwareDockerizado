@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,6 +16,7 @@ import {
   XCircle,
   AlertCircle,
 } from "lucide-react"
+import { obtenerPublicacionesPorUsuarios } from "../biblioteca/publicacionService"
 
 const HistorialPage = () => {
   const [searchTerm, setSearchTerm] = useState("")
@@ -23,83 +24,35 @@ const HistorialPage = () => {
   const [filterStatus, setFilterStatus] = useState("todos")
 
   // Datos de ejemplo del historial
-  const historialData = [
-    {
-      id: 1,
-      tipo: "intercambio",
-      libro: "Cien años de soledad",
-      autor: "Gabriel García Márquez",
-      usuario: "María González",
-      fecha: "2024-01-15",
-      estado: "completado",
-      descripcion: 'Intercambio por "El Principito"',
-      imagen: "https://bookscompany.pe/wp-content/uploads/2025/02/9788466379717.jpg",
-    },
-    {
-      id: 2,
-      tipo: "donacion",
-      libro: "1984",
-      autor: "George Orwell",
-      usuario: "Carlos Ruiz",
-      fecha: "2024-01-10",
-      estado: "completado",
-      descripcion: "Donación realizada",
-      imagen: "/placeholder.svg?height=300&width=200&text=1984",
-    },
-    {
-      id: 3,
-      tipo: "intercambio",
-      libro: "Don Quijote de la Mancha",
-      autor: "Miguel de Cervantes",
-      usuario: "Ana Martín",
-      fecha: "2024-01-08",
-      estado: "pendiente",
-      descripcion: 'Intercambio por "Rayuela"',
-      imagen: "https://www.crisol.com.pe/media/catalog/product/cache/f6d2c62455a42b0d712f6c919e880845/9/7/9788408270881_0dqzsviz3oiwevu0.jpg",
-    },
-    {
-      id: 4,
-      tipo: "donacion",
-      libro: "El Principito",
-      autor: "Antoine de Saint-Exupéry",
-      usuario: "Luis Fernández",
-      fecha: "2024-01-05",
-      estado: "cancelado",
-      descripcion: "Donación cancelada por el usuario",
-      imagen: "https://www.elvirrey.com/imagenes/9786124/978612470538.GIF",
-    },
-    {
-      id: 5,
-      tipo: "intercambio",
-      libro: "Rayuela",
-      autor: "Julio Cortázar",
-      usuario: "Elena Vásquez",
-      fecha: "2024-01-03",
-      estado: "en_proceso",
-      descripcion: "Intercambio en proceso de coordinación",
-      imagen: "https://www.crisol.com.pe/media/catalog/product/cache/f6d2c62455a42b0d712f6c919e880845/9/7/9786124346491_fnuyk3tvtygeu1l4.jpg",
-    },
-    {
-      id: 6,
-      tipo: "donacion",
-      libro: "La Casa de los Espíritus",
-      autor: "Isabel Allende",
-      usuario: "Roberto Silva",
-      fecha: "2023-12-28",
-      estado: "completado",
-      descripcion: "Donación entregada exitosamente",
-      imagen: "https://aldogal.wordpress.com/wp-content/uploads/2012/04/la-casa-de-los-espiritus1.jpg",
-    },
-  ]
+
+  const [historialData, setHistorialData] = useState([])
+
+  useEffect(() => {
+    const fetchHistorialUsuario = async()=>{
+      const user = JSON.parse(localStorage.getItem("currentUser"))
+
+      const response = await obtenerPublicacionesPorUsuarios(user.id)
+
+      console.log(response)
+
+      if(response){
+        setHistorialData(response)
+      }
+    }
+
+    fetchHistorialUsuario()
+  
+  }, [])
+  
 
   // Filtrar datos
   const filteredData = historialData.filter((item) => {
     const matchesSearch =
-      item.libro.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.usuario.toLowerCase().includes(searchTerm.toLowerCase())
+      item.libro.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.libro.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.usuario.nombre.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filterType === "todos" || item.tipo === filterType
-    const matchesStatus = filterStatus === "todos" || item.estado === filterStatus
+    const matchesStatus = filterStatus === "todos" || item.estado_libro === filterStatus
 
     return matchesSearch && matchesType && matchesStatus
   })
@@ -109,7 +62,7 @@ const HistorialPage = () => {
     total: historialData.length,
     intercambios: historialData.filter((item) => item.tipo === "intercambio").length,
     donaciones: historialData.filter((item) => item.tipo === "donacion").length,
-    completados: historialData.filter((item) => item.estado === "completado").length,
+    completados: historialData.filter((item) => item.is_active === false ).length,
   }
 
   const getStatusIcon = (estado) => {
@@ -296,8 +249,8 @@ const HistorialPage = () => {
                     {/* Imagen del libro */}
                     <div className="flex-shrink-0">
                       <img
-                        src={item.imagen || "/placeholder.svg"}
-                        alt={item.libro}
+                        src={item.imagen_url || "/placeholder.svg"}
+                        alt={item.libro.titulo}
                         className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-lg border border-amber-200"
                       />
                     </div>
@@ -306,8 +259,8 @@ const HistorialPage = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
                         <div>
-                          <h3 className="text-lg font-semibold text-gray-900 truncate">{item.libro}</h3>
-                          <p className="text-sm text-gray-600">{item.autor}</p>
+                          <h3 className="text-lg font-semibold text-gray-900 truncate">{item.libro.titulo}</h3>
+                          <p className="text-sm text-gray-600">{item.libro.autor}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           {getTipoIcon(item.tipo)}
@@ -319,17 +272,17 @@ const HistorialPage = () => {
                         <div className="flex items-center gap-4 text-sm text-gray-600">
                           <div className="flex items-center gap-1">
                             <User className="h-4 w-4" />
-                            <span>{item.usuario}</span>
+                            <span>{item.usuario.name}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{formatDate(item.fecha)}</span>
+                            <span>{formatDate(item.created_at)}</span>
                           </div>
                         </div>
-                        {getStatusBadge(item.estado)}
+                        {/* {getStatusBadge(item.estado)} */}
                       </div>
 
-                      <p className="text-sm text-gray-600 mt-2">{item.descripcion}</p>
+                      <p className="text-sm text-gray-600 mt-2">{item.comentarios_adicionales}</p>
                     </div>
                   </div>
                 </CardContent>

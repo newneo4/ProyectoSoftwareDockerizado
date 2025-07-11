@@ -24,10 +24,11 @@ import {
   Clock,
   X,
 } from "lucide-react"
+import { obtenerLibros } from "../book/bookService"
+import { crearPublicacion } from "./publicacionService"
 
 const BibliotecaPage = () => {
   const navigate = useNavigate()
-  const location = useLocation()
   const [currentView, setCurrentView] = useState("biblioteca") // "biblioteca" o "publicar"
   const [selectedBookId, setSelectedBookId] = useState(null)
   const [searchQuery, setSearchQuery] = useState("")
@@ -48,29 +49,29 @@ const BibliotecaPage = () => {
     barrioZona: "",
   })
 
-  // Mensaje de éxito si viene del registro
-  const locationSuccessMessage = location.state?.message
-  const newBook = location.state?.newBook
 
-  // useEffect(() => {
-  //   let booksToSet = [...initialBooks]
+  const fetchLibrosUsuario = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("currentUser"));
+      if (!user?.id) return;
 
-  //   if (newBook) {
-  //     booksToSet = [newBook, ...booksToSet]
-  //   }
+      const libros = await obtenerLibros(user.id);
+      console.log("Libros del usuario:", libros);
 
-  //   setBooks(booksToSet)
-
-  //   if (locationSuccessMessage) {
-  //     setSuccessMessage(locationSuccessMessage)
-  //     setTimeout(() => setSuccessMessage(""), 5000)
-  //   }
-  // }, [newBook, locationSuccessMessage])
+      setBooks(libros);  // ✅ Asignar libros obtenidos
+      localStorage.setItem("libros", JSON.stringify(libros));
+    } catch (error) {
+      console.error("Error al obtener libros:", error);
+    }
+  };
 
   useEffect(() => {
     const storedBooks = localStorage.getItem("libros");
 
-    if (storedBooks) {
+    const response = fetchLibrosUsuario()
+    console.log(response)
+
+    if (!response) {
       try {
         setBooks(JSON.parse(storedBooks));
       } catch (error) {
@@ -111,10 +112,13 @@ const BibliotecaPage = () => {
 
   const getImageSrc = (book) => {
     if (imageLoadErrors[book.id]) {
-      return `/placeholder.svg?height=300&width=200&text=${encodeURIComponent(book.titulo)}`
+        return `/placeholder.svg?height=300&width=200&text=${encodeURIComponent(book.titulo)}`
+      }
+
+      // Usa la URL completa si está disponible
+      return book.imagen_url || `/placeholder.svg?height=300&width=200&text=${encodeURIComponent(book.titulo)}`
     }
-    return book.imagen || `/placeholder.svg?height=300&width=200&text=${encodeURIComponent(book.titulo)}`
-  }
+
 
   const handlePublish = (bookId) => {
     setSelectedBookId(bookId)
@@ -176,14 +180,6 @@ const BibliotecaPage = () => {
       setError("Debes seleccionar el tipo de transacción")
       return false
     }
-    if (!publishFormData.ciudad) {
-      setError("Debes seleccionar una ciudad")
-      return false
-    }
-    if (!publishFormData.barrioZona.trim()) {
-      setError("Debes especificar el barrio o zona")
-      return false
-    }
     return true
   }
 
@@ -217,10 +213,30 @@ const BibliotecaPage = () => {
 
     setLoading(true)
 
+            // libro_id=data['libro_id'],
+            // usuario_id=data['usuario_id'],
+            // tipo=TipoPublicacionEnum(data['tipo']),
+            // estado_libro=EstadoLibroEnum(data['estado_libro']),
+            // ubicacion=data['ubicacion'],
+            // comentarios_adicionales=data.get('comentarios_adicionales'),
+            // imagen_url=data.get('imagen_url')
+    console.log(selectedBook)
+
+    const data = {
+      libro_id: selectedBook.id,
+      usuario_id: selectedBook.usuario_id,
+      tipo: publishFormData.tipoTransaccion,
+      estado_libro:  publishFormData.estadoLibro,
+      ubicacion: "",
+      comentarios_adicionales : publishFormData.descripcion,
+      imagen_url: selectedBook.imagen_url
+    } 
+
     try {
       console.log("Publicando libro:", { bookId: selectedBookId, ...publishFormData })
 
       // Simular delay de API
+      await crearPublicacion(data)
       await new Promise((resolve) => setTimeout(resolve, 1500))
 
       // Actualizar el estado del libro como publicado
@@ -369,20 +385,6 @@ const BibliotecaPage = () => {
                       onError={() => handleImageError(book.id)}
                       loading="lazy"
                     />
-                    {/* Badge de estado */}
-                    <div className="absolute top-3 right-3">
-                      {book.publicado ? (
-                        <Badge className="bg-green-500 hover:bg-green-600 text-white">
-                          <CheckCircle className="mr-1 h-3 w-3" />
-                          Publicado
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                          <Clock className="mr-1 h-3 w-3" />
-                          Pendiente
-                        </Badge>
-                      )}
-                    </div>
                   </div>
                   <CardContent className="p-4 flex-grow">
                     <h3 className="font-bold text-lg mb-1 line-clamp-2">{book.titulo}</h3>
@@ -412,13 +414,13 @@ const BibliotecaPage = () => {
                     <Button
                       onClick={() => handlePublish(book.id)}
                       className={`w-full ${
-                        book.publicado
+                        book.esta_publicado
                           ? "bg-gray-100 text-gray-500 cursor-not-allowed hover:bg-gray-100"
                           : "bg-blue-600 hover:bg-blue-700"
                       }`}
-                      disabled={book.publicado}
+                      disabled={book.esta_publicado}
                     >
-                      {book.publicado ? (
+                      {book.esta_publicado ? (
                         <>
                           <CheckCircle className="mr-2 h-4 w-4" />
                           Ya Publicado
@@ -495,8 +497,6 @@ const BibliotecaPage = () => {
                   <p className="text-gray-600 mb-2">{selectedBook.autor}</p>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="outline">{selectedBook.genero}</Badge>
-                    <Badge variant="outline">{selectedBook.año}</Badge>
-                    {selectedBook.editorial && <Badge variant="outline">{selectedBook.editorial}</Badge>}
                   </div>
                 </div>
               </div>
@@ -562,19 +562,6 @@ const BibliotecaPage = () => {
                   </RadioGroup>
                 </div>
 
-                {/* Notas adicionales */}
-                <div className="space-y-2">
-                  <Label htmlFor="notasAdicionales">Notas adicionales</Label>
-                  <Textarea
-                    id="notasAdicionales"
-                    name="notasAdicionales"
-                    value={publishFormData.notasAdicionales}
-                    onChange={handlePublishFormChange}
-                    placeholder="Menciona cualquier detalle importante sobre el estado del libro (páginas marcadas, dedicatorias, etc.)"
-                    rows={3}
-                    disabled={loading}
-                  />
-                </div>
               </CardContent>
             </Card>
 
@@ -605,58 +592,6 @@ const BibliotecaPage = () => {
                     </div>
                   </div>
                 </RadioGroup>
-              </CardContent>
-            </Card>
-
-            {/* Ubicación y Entrega */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-5 w-5" />
-                  Ubicación y Entrega
-                </CardTitle>
-                <p className="text-sm text-gray-600">Información sobre dónde y cómo entregar el libro</p>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Ciudad */}
-                  <div className="space-y-2">
-                    <Label htmlFor="ciudad">
-                      Ciudad <span className="text-red-500">*</span>
-                    </Label>
-                    <Select
-                      value={publishFormData.ciudad}
-                      onValueChange={(value) => handleSelectChange("ciudad", value)}
-                      disabled={loading}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecciona tu ciudad" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {ciudades.map((ciudad) => (
-                          <SelectItem key={ciudad} value={ciudad}>
-                            {ciudad}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Barrio/Zona */}
-                  <div className="space-y-2">
-                    <Label htmlFor="barrioZona">
-                      Barrio/Zona <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="barrioZona"
-                      name="barrioZona"
-                      value={publishFormData.barrioZona}
-                      onChange={handlePublishFormChange}
-                      placeholder="Ej: Chapinero, El Poblado"
-                      disabled={loading}
-                    />
-                  </div>
-                </div>
               </CardContent>
             </Card>
 

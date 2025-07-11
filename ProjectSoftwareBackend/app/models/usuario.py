@@ -14,8 +14,6 @@ class Usuario(db.Model):
     
     tipo_usuario = db.relationship('TipoUsuario', back_populates='usuarios')
     libros = db.relationship('Libro', backref='dueño', lazy=True)
-    solicitudes_recibidas = db.relationship('Solicitud', backref='dueño_libro', lazy=True)
-
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
