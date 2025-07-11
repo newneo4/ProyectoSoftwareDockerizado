@@ -5,7 +5,6 @@ ProjectSoftwareBackend/*.pyc
 ProjectSoftwareBackend/.env
 ProjectSoftwareBackend/venv/
 ProjectSoftwareBackend/env/
-ProjectSoftwareBackend/instance/
 ProjectSoftwareBackend/*.db
 ProjectSoftwareBackend/.mypy_cache/
 ProjectSoftwareBackend/.pytest_cache/
