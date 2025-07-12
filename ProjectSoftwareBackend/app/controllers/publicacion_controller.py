@@ -121,7 +121,7 @@ def obtener_publicaciones_por_usuario(usuario_id):
                 'genero': p.libro.genero.nombre if p.libro.genero else None,
             },
             'usuario': {
-                'nombre': p.usuario.nombre, 
+                'nombre': p.usuario.nombre if p.usuario else 'Usuario desconocido',
                 'email': p.usuario.email,
             }
         } for p in publicaciones
