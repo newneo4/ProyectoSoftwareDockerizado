@@ -45,7 +45,7 @@ def obtener_publicaciones():
                 'genero_id': p.libro.genero_id,
             },
             'usuario': {
-                'nombre': p.usuario.nombre, 
+                'nombre': p.usuario.nombre if p.usuario else 'Usuario desconocido',
                 'email': p.usuario.email,
             }
         } for p in publicaciones
