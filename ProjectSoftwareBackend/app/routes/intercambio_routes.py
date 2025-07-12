@@ -5,7 +5,8 @@ from app.controllers.intercambio_controller import (
     obtener_intercambio,
     aceptar_intercambio,
     rechazar_intercambio,
-    listar_intercambios_por_usuario
+    listar_intercambios_por_usuario,
+    listar_intercambios_enviados_por_usuario
 )
 
 intercambio_bp = Blueprint('intercambio_bp', __name__, url_prefix='/intercambios')
@@ -41,5 +42,9 @@ def rechazar(id):
 def listar_por_usuario(usuario_id):
     return listar_intercambios_por_usuario(usuario_id)
 
+
+@intercambio_bp.route('/enviados/<int:usuario_id>', methods=['GET'])
+def listar_enviados(usuario_id):
+    return listar_intercambios_enviados_por_usuario(usuario_id)
 
 print("✅ intercambio_routes.py CARGADO")

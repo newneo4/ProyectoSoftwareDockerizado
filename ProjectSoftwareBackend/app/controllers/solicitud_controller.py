@@ -108,3 +108,30 @@ def listar_solicitudes_por_usuario(usuario_id):
         })
 
     return jsonify(resultado)
+
+def listar_solicitudes_enviadas_por_usuario(usuario_id):
+    solicitudes = Solicitud.query.filter_by(usuario_solicitante_id=usuario_id).all()
+
+    resultado = []
+    for solicitud in solicitudes:
+        resultado.append({
+            "id": solicitud.id,
+            "estado": solicitud.estado,
+            "mensaje": solicitud.mensaje,
+            "created_at": solicitud.created_at.isoformat(),
+
+            "libro": {
+                "id": solicitud.libro.id,
+                "titulo": solicitud.libro.titulo,
+                "autor": solicitud.libro.autor
+            },
+
+            "usuario_destinatario": {
+                "id": solicitud.aceptado_por_usuario.id if solicitud.aceptado_por_usuario else None,
+                "nombre": solicitud.aceptado_por_usuario.nombre if solicitud.aceptado_por_usuario else None,
+                "apellido": solicitud.aceptado_por_usuario.apellido if solicitud.aceptado_por_usuario else None,
+                "email": solicitud.aceptado_por_usuario.email if solicitud.aceptado_por_usuario else None
+            }
+        })
+
+    return jsonify(resultado), 200

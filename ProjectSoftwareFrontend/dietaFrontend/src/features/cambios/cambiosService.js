@@ -65,3 +65,14 @@ export const obtenerIntercambiosPorUsuario = async (usuarioId) => {
     throw error;
   }
 };
+
+
+export const obtenerIntercambiosPorEnviados = async (usuarioId) => {
+  try {
+    const response = await api.get(`/intercambios/enviados/${usuarioId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener intercambios del usuario:", error);
+    throw error;
+  }
+};

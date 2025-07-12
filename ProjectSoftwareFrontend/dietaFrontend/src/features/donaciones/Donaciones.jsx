@@ -2,15 +2,18 @@ import { BookHeart, MailCheck, ThumbsDown } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import {
   obtenerSolicitudesPorUsuario,
+  obtenerSolicitudesEnviadasPorUsuario,
   aceptarSolicitud,
   rechazarSolicitud,
 } from './donacionesService';
 
 const estados = ['todas', 'pendiente', 'aceptada', 'rechazado'];
+const vistas = ['recibidas', 'enviadas'];
 
 const DonacionesPage = () => {
   const [solicitudes, setSolicitudes] = useState([]);
   const [estadoSeleccionado, setEstadoSeleccionado] = useState('todas');
+  const [vista, setVista] = useState('recibidas');
   const [loading, setLoading] = useState(true);
 
   const usuarioId = JSON.parse(localStorage.getItem('currentUser'))?.id;
@@ -18,7 +21,12 @@ const DonacionesPage = () => {
   const cargarSolicitudes = async () => {
     try {
       setLoading(true);
-      const data = await obtenerSolicitudesPorUsuario(usuarioId);
+      let data = [];
+      if (vista === 'recibidas') {
+        data = await obtenerSolicitudesPorUsuario(usuarioId);
+      } else {
+        data = await obtenerSolicitudesEnviadasPorUsuario(usuarioId);
+      }
       setSolicitudes(data);
     } catch (error) {
       console.error('Error al cargar solicitudes:', error);
@@ -39,7 +47,7 @@ const DonacionesPage = () => {
 
   useEffect(() => {
     if (usuarioId) cargarSolicitudes();
-  }, [usuarioId]);
+  }, [usuarioId, vista]);
 
   const solicitudesFiltradas =
     estadoSeleccionado === 'todas'
@@ -58,8 +66,25 @@ const DonacionesPage = () => {
             </h1>
           </div>
           <div className="text-sm text-amber-700">
-            Gestiona tu historial de intercambios y donaciones
+            Gestiona tu historial de solicitudes de libros
           </div>
+        </div>
+
+        {/* Selector de vista */}
+        <div className="flex gap-4 mb-4">
+          {vistas.map((opcion) => (
+            <button
+              key={opcion}
+              onClick={() => setVista(opcion)}
+              className={`px-4 py-2 rounded-md font-semibold transition ${
+                vista === opcion
+                  ? 'bg-amber-800 text-white'
+                  : 'bg-white text-amber-800 border border-amber-300 hover:bg-amber-100'
+              }`}
+            >
+              {opcion === 'recibidas' ? 'Recibidas' : 'Enviadas'}
+            </button>
+          ))}
         </div>
 
         {/* Filtros */}
@@ -101,9 +126,10 @@ const DonacionesPage = () => {
                     </span>
                   </p>
                   <p className="text-gray-700">
-                    👤 Solicitado por:{' '}
-                    {solicitud.usuario_solicitante?.nombre}{' '}
-                    {solicitud.usuario_solicitante?.apellido}
+                    👤 {vista === 'recibidas' ? 'Solicitado por' : 'Solicitado a'}:{' '}
+                    {vista === 'recibidas'
+                      ? `${solicitud.usuario_solicitante?.nombre} ${solicitud.usuario_solicitante?.apellido}`
+                      : `${solicitud.usuario_destinatario?.nombre} ${solicitud.usuario_destinatario?.apellido}`}
                   </p>
                   <p className="text-gray-600 mt-1 italic">
                     ✉️ {solicitud.mensaje || 'Sin mensaje'}
@@ -114,7 +140,8 @@ const DonacionesPage = () => {
                   </p>
                 </div>
 
-                {solicitud.estado === 'pendiente' && (
+                {/* Solo mostrar botones en vista recibidas y si está pendiente */}
+                {vista === 'recibidas' && solicitud.estado === 'pendiente' && (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAceptar(solicitud.id)}

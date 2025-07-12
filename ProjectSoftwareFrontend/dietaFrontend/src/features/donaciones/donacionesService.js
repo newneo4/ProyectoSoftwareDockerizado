@@ -34,6 +34,17 @@ export const obtenerSolicitudesPorUsuario = async (usuarioId) => {
   }
 };
 
+
+export const obtenerSolicitudesEnviadasPorUsuario = async (usuarioId) => {
+  try {
+    const response = await api.get(`/solicitudes/enviadas/${usuarioId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error al obtener solicitudes del usuario:", error);
+    throw error;
+  }
+};
+
 // Obtener detalle de una solicitud
 export const obtenerSolicitudPorId = async (solicitudId) => {
   try {

@@ -5,7 +5,8 @@ from app.controllers.solicitud_controller import (
     obtener_solicitud,
     aceptar_solicitud,
     rechazar_solicitud,
-    listar_solicitudes_por_usuario
+    listar_solicitudes_por_usuario,
+    listar_solicitudes_enviadas_por_usuario
 )
 
 solicitud_bp = Blueprint('solicitud_bp', __name__, url_prefix='/solicitudes')
@@ -34,6 +35,10 @@ def rechazar(id):
 @solicitud_bp.route('/usuario/<int:usuario_id>', methods=['GET'])
 def listar_por_usuario(usuario_id):
     return listar_solicitudes_por_usuario(usuario_id)
+
+@solicitud_bp.route('/enviadas/<int:usuario_id>', methods=['GET'])
+def listar_enviadas(usuario_id):
+    return listar_solicitudes_enviadas_por_usuario(usuario_id)
 
 
 print("✅ solicitud_routes.py CARGADO")

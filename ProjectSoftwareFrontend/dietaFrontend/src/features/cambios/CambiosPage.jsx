@@ -2,15 +2,18 @@ import { BookHeart, MailCheck, ThumbsDown } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import {
   obtenerIntercambiosPorUsuario,
+  obtenerIntercambiosPorEnviados,
   aceptarIntercambio,
   rechazarIntercambio,
 } from './cambiosService';
 
 const estados = ['todas', 'pendiente', 'aceptado', 'rechazado'];
+const vistas = ['recibidos', 'enviados'];
 
 const CambiosPage = () => {
   const [intercambios, setIntercambios] = useState([]);
   const [estadoSeleccionado, setEstadoSeleccionado] = useState('todas');
+  const [vista, setVista] = useState('recibidos');
   const [loading, setLoading] = useState(true);
 
   const usuarioId = JSON.parse(localStorage.getItem('currentUser'))?.id;
@@ -18,7 +21,12 @@ const CambiosPage = () => {
   const cargarIntercambios = async () => {
     try {
       setLoading(true);
-      const data = await obtenerIntercambiosPorUsuario(usuarioId);
+      let data = [];
+      if (vista === 'recibidos') {
+        data = await obtenerIntercambiosPorUsuario(usuarioId);
+      } else {
+        data = await obtenerIntercambiosPorEnviados(usuarioId);
+      }
       setIntercambios(data);
     } catch (error) {
       console.error('Error al cargar intercambios:', error);
@@ -38,8 +46,10 @@ const CambiosPage = () => {
   };
 
   useEffect(() => {
-    if (usuarioId) cargarIntercambios();
-  }, [usuarioId]);
+    if (usuarioId) {
+      cargarIntercambios();
+    }
+  }, [usuarioId, vista]);
 
   const intercambiosFiltrados =
     estadoSeleccionado === 'todas'
@@ -62,7 +72,24 @@ const CambiosPage = () => {
           </div>
         </div>
 
-        {/* Filtros */}
+        {/* Selector de vista */}
+        <div className="flex gap-4 mb-4">
+          {vistas.map((opcion) => (
+            <button
+              key={opcion}
+              onClick={() => setVista(opcion)}
+              className={`px-4 py-2 rounded-md font-semibold transition ${
+                vista === opcion
+                  ? 'bg-amber-800 text-white'
+                  : 'bg-white text-amber-800 border border-amber-300 hover:bg-amber-100'
+              }`}
+            >
+              {opcion === 'recibidos' ? 'Recibidos' : 'Enviados'}
+            </button>
+          ))}
+        </div>
+
+        {/* Filtros por estado */}
         <div className="flex flex-wrap gap-2 mb-4">
           {estados.map((estado) => (
             <button
@@ -98,16 +125,19 @@ const CambiosPage = () => {
                     🎁 Ofrece:{' '}
                     <span className="font-bold">
                       {intercambio.libro_ofrecido?.titulo || 'N/A'}
-                    </span>{' '}
-                    📖 Pide:{' '}
+                    </span>
+                  </p>
+                  <p className="text-lg text-amber-900 font-semibold">
+                    🎁 Pide:{' '}
                     <span className="font-bold">
                       {intercambio.libro_pedido?.titulo || 'N/A'}
                     </span>
                   </p>
                   <p className="text-gray-700">
-                    👤 Solicitado por:{' '}
-                    {intercambio.usuario_solicitante?.nombre}{' '}
-                    {intercambio.usuario_solicitante?.apellido}
+                    👤 {vista === 'recibidos' ? 'Solicitado por' : 'Enviado a'}:{' '}
+                    {vista === 'recibidos'
+                      ? `${intercambio.usuario_solicitante?.nombre} ${intercambio.usuario_solicitante?.apellido}`
+                      : `${intercambio.usuario_receptor?.nombre} ${intercambio.usuario_receptor?.apellido}`}
                   </p>
                   <p className="text-gray-600 mt-1 italic">
                     ✉️ {intercambio.message || 'Sin mensaje'}
@@ -118,7 +148,8 @@ const CambiosPage = () => {
                   </p>
                 </div>
 
-                {intercambio.status === 'pendiente' && (
+                {/* Solo permitir aceptar/rechazar si la vista es 'recibidos' */}
+                {vista === 'recibidos' && intercambio.status === 'pendiente' && (
                   <div className="flex gap-2">
                     <button
                       onClick={() => handleAceptar(intercambio.id)}

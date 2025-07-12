@@ -126,3 +126,36 @@ def listar_intercambios_por_usuario(usuario_id):
         })
 
     return jsonify(resultado), 200
+
+def listar_intercambios_enviados_por_usuario(usuario_id):
+    intercambios = Intercambio.query.filter_by(sender_user_id=usuario_id).all()
+
+    resultado = []
+    for i in intercambios:
+        resultado.append({
+            "id": i.id,
+            "status": i.status,
+            "message": i.message,
+            "created_at": i.created_at.isoformat(),
+
+            "libro_ofrecido": {
+                "id": i.libro_ofrecido.id,
+                "titulo": i.libro_ofrecido.titulo,
+                "autor": i.libro_ofrecido.autor
+            },
+
+            "libro_pedido": {
+                "id": i.libro_pedido.id,
+                "titulo": i.libro_pedido.titulo,
+                "autor": i.libro_pedido.autor
+            },
+
+            "usuario_receptor": {
+                "id": i.aceptado_por_usuario.id,
+                "nombre": i.aceptado_por_usuario.nombre,
+                "apellido": i.aceptado_por_usuario.apellido,
+                "email": i.aceptado_por_usuario.email
+            }
+        })
+
+    return jsonify(resultado), 200
