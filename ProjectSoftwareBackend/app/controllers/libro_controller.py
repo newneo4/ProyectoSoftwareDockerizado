@@ -56,7 +56,8 @@ def buscar_libros(titulo=None, autor=None):
     for libro in libros:
         imagen_url = None
         if libro.imagen:
-            imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+            # imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+            imagen_url = f"http://142.93.200.218:5000/static/uploads/{libro.imagen}"
 
         resultado.append({
             "id": libro.id,
@@ -81,7 +82,8 @@ def obtener_libros_por_usuario(usuario_id):
     for libro in libros:
         imagen_url = None
         if libro.imagen:
-            imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+            # imagen_url = f"http://localhost:5000/static/uploads/{libro.imagen}"
+            imagen_url = f"http://142.93.200.218:5000/static/uploads/{libro.imagen}"            
 
         publicacion_activa = Publicacion.query.filter_by(libro_id=libro.id).first()
 
