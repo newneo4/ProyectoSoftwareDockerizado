@@ -46,7 +46,7 @@ def obtener_publicaciones():
             },
             'usuario': {
                 'nombre': p.usuario.nombre if p.usuario else 'Usuario desconocido',
-                'email': p.usuario.email,
+                'email': p.usuario.email if p.usuario else 'Usuario desconocido',
             }
         } for p in publicaciones
     ]
@@ -122,7 +122,7 @@ def obtener_publicaciones_por_usuario(usuario_id):
             },
             'usuario': {
                 'nombre': p.usuario.nombre if p.usuario else 'Usuario desconocido',
-                'email': p.usuario.email,
+                'email': p.usuario.email if p.usuario else 'Usuario desconocido',
             }
         } for p in publicaciones
     ]
